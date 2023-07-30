@@ -1,0 +1,40 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "material": {
+          "certpath": "C:\\Users\\xian.liu\\.ohos\\config\\openharmony\\auto_ohos_default_Mydevice_com.example.mydevice.cer",
+          "storePassword": "0000001AADC8D3D9C6C164A0562DC3F9B65F067127AC80E3101D40C3443B5FE9CD5B4BE9487A2DD74A43",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001A567C679819F4BD5CA72713C75E39043453CA24BAF34C5630D30E73E53F3AF26512139ADE39C1",
+          "profile": "C:\\Users\\xian.liu\\.ohos\\config\\openharmony\\auto_ohos_default_Mydevice_com.example.mydevice.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\xian.liu\\.ohos\\config\\openharmony\\auto_ohos_default_Mydevice_com.example.mydevice.p12"
+        }
+      }
+    ],
+    "compileSdkVersion": 9,
+    "compatibleSdkVersion": 9,
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}
