@@ -223,10 +223,16 @@ export struct PlaneGame {
               case PHASE_PLAY:
                 hero1.x = this.x
                 hero1.y = this.y
-                if(globalThis.remote == 1)
+                if(globalThis.remote == 1 || globalThis.remote1 == 1 )
                 {
+                  console.info("lxlx 通过re对象位移了")
                   hero1.x =globalThis.x
                   hero1.y =globalThis.y
+                  this.x =globalThis.x
+                  this.y = globalThis.y
+                  globalThis.remote = 0
+                  globalThis.remote1 = 0
+
                 }
                 offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
                 drawenemy1()
@@ -248,6 +254,13 @@ export struct PlaneGame {
           this.x=event.touches[0].x-124
           this.y=event.touches[0].y-50
           push_xy(event.touches[0].x-124,event.touches[0].y-50)
+          if(globalThis.app == 1)
+          {
+            console.info("lxlx 全局对象修改")
+            globalThis.remoteObject.x = event.touches[0].x-124
+            globalThis.remoteObject.y = event.touches[0].y-50
+          }
+
         })
         .onClick((event)=>{
           if(curPhase == 2 && event.x > 96 && event.y > 96 )

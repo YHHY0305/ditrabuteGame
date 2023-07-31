@@ -5,7 +5,7 @@ import distributedDataObject from '@ohos.data.distributedDataObject';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want, launchParam) {
-    let remoteObject
+
     let sessionId = '123456';
     let funcAbilityWant = want;
     console.info("lxlx test")
@@ -14,8 +14,8 @@ export default class EntryAbility extends UIAbility {
     if(funcAbilityWant.parameters.info == 1)
     {
       console.info("lxlx jinlai;")
-      //jion
-      remoteObject = distributedDataObject.create(this.context, {
+      //join
+        globalThis.remoteObject = distributedDataObject.create(this.context, {
         name:undefined,
         x:undefined,
         y:undefined,
@@ -23,9 +23,9 @@ export default class EntryAbility extends UIAbility {
       })
       console.info("lxlx  daozhelil")
 
-        remoteObject.setSessionId(sessionId).then(()=>{
+      globalThis.remoteObject.setSessionId(sessionId).then(()=>{
           console.info("lxlx join session.");
-          console.info("lxlx"+remoteObject.name)
+          console.info("lxlx"+globalThis.remoteObject.name)
         }).catch((erro)=>{
           console.info("lxlx加入错误"+erro.code+erro.message)
         })
@@ -33,15 +33,17 @@ export default class EntryAbility extends UIAbility {
       function changeCallback(sessionId, changeData) {
         console.info(`change: ${sessionId}`);
         if (changeData !== null && changeData !== undefined) {
-          globalThis.x = remoteObject.x
-          globalThis.y = remoteObject.y
+          // console.info("lxlx 有变化")
+          globalThis.x = globalThis.remoteObject.x
+          globalThis.y = globalThis.remoteObject.y
           globalThis.remote = 1
-          globalThis.status = remoteObject.status
+          globalThis.app = 1
+          globalThis.status = globalThis.remoteObject.status
           changeData.forEach(element => {
           });
         }
       }
-      remoteObject.on("change", changeCallback.bind(this));
+      globalThis.remoteObject.on("change", changeCallback.bind(this));
     }
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
   }

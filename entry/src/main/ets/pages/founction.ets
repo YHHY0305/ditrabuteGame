@@ -7,7 +7,6 @@ let deviceList1:deviceManager.DeviceInfo[]
 context = getContext(this) as any
 g_object = distributedObject.create(context, {name:"game", x:0,y:0,status:2});
 
-
 @Component
 export struct Gauge_show {
   @Link value: number;
@@ -106,7 +105,6 @@ export struct link_device{
 export function push_xy(x:number,y:number){
   g_object.x=x
   g_object.y=y
-  // console.info("lxlx"+g_object.x+'  '+g_object.y)
 }
 
 export function get_device():deviceManager.DeviceInfo[]
@@ -134,8 +132,12 @@ export function  activeapp(dviceid:String):Array<number>
       changeData.forEach(element => {
         x = g_object.x
         y = g_object.y
+        globalThis.remote1 = 1
+        globalThis.x = x
+        globalThis.y = y
         Coordinate.push(x)
         Coordinate.push(y)
+        console.info("lxlx"+x+"   "+y)
         console.info(`lxlx The element ${g_object[element]} changed.`);
       });
     }
