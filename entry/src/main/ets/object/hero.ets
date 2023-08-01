@@ -1,12 +1,15 @@
 export class hero{
   x:number = 676
   y:number = 142
+  width:number = 124
+  height:number = 99
   index:number = 0
   count:number = 9
   hCout:number = 0
   eCout:number = 0
   n:number = 0
-  life:number = 3
+  removable:number = 0
+  life:number = 6
 }
 export class enemy{
   x:number = 0

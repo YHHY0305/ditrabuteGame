@@ -5,7 +5,6 @@ import distributedDataObject from '@ohos.data.distributedDataObject';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want, launchParam) {
-
     let sessionId = '123456';
     let funcAbilityWant = want;
     console.info("lxlx test")

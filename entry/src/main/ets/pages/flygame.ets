@@ -33,7 +33,7 @@ let hero1 = new hero
 let settings:RenderingContextSettings = new RenderingContextSettings(true)
 let context: CanvasRenderingContext2D = new CanvasRenderingContext2D(settings)
 let offContext:OffscreenCanvasRenderingContext2D= new OffscreenCanvasRenderingContext2D(csreen_width, csreen_height, settings)
-
+let score = 0
 
 function  nIgm(scr)
 {
@@ -63,7 +63,36 @@ function  paintLogo()
 
 function  drawGameOver()
 {
-
+  ActionSheet.show({
+    title: '游戏结束',
+    message: 'message',
+    autoCancel: true,
+    confirm: {
+      value: '确定',
+      action: () => {
+        console.log('Get Alert Dialog handled')
+      }
+    },
+    cancel: () => {
+      console.log('actionSheet canceled')
+    },
+    alignment: DialogAlignment.Bottom,
+    offset: { dx: 0, dy: -10 },
+    sheets: [
+      {
+        title: '你的得分为'+score,
+        action: () => {
+          console.log('pears')
+        }
+      }
+    ]
+  })
+  curPhase = PHASE_READY
+  hero1.life = 6
+  score = 0
+  hero1.index = 0
+  hullet1 = []
+  enemy1 = []
 }
 
 function  drawPause()
@@ -73,18 +102,20 @@ function  drawPause()
 
 function  drawhero()
 {
+  let i = 0
   if(hero1.life > 0){
-    switch(hero1.life){
-      case 3:
-        offContext.drawImage(nIgm(imgName[8][0]),hero1.x,hero1.y)
-        break
-      case 2:
-        offContext.drawImage(nIgm(imgName[8][1]),hero1.x,hero1.y)
-        break
-      case 1:
-        offContext.drawImage(nIgm(imgName[8][2]),hero1.x,hero1.y)
-        break
-    }
+    // switch(hero1.life){
+    //   case 3:
+    //     offContext.drawImage(nIgm(imgName[8][0]),hero1.x,hero1.y)
+    //     break
+    //   case 2:
+    //     offContext.drawImage(nIgm(imgName[8][1]),hero1.x,hero1.y)
+    //     break
+    //   case 1:
+    //     offContext.drawImage(nIgm(imgName[8][2]),hero1.x,hero1.y)
+    //     break
+    // }
+    offContext.drawImage(nIgm(imgName[8][hero1.index]),hero1.x,hero1.y)
     hero1.count++
     if(hero1.count % 3 == 0)
     {
@@ -101,6 +132,35 @@ function  drawhero()
     curPhase = PHASE_GAMEOVER
     return
   }
+  for(i = 0;i < enemy1.length ; i++)
+  {
+      let e = enemy1[i]
+      if(e.x+e.width >= hero1.x && hero1.x + hero1.width >= e.x  && e.y+e.height >= hero1.y && hero1.y+hero1.height >= e.y)
+      {
+
+        e.life-=1
+        enemy1[i].index+=1
+        hero1.index += 1
+        hero1.life -= 1
+        if(hero1.life < 0)
+        {
+          hero1.life = 0
+        }
+        if(e.life < 0)
+        {
+          e.life = 0
+        }
+        if(enemy1[i].index == 4 )
+        {
+          enemy1[i].index ==0
+        }
+        if(hero1.index == 4 )
+        {
+          hero1.index =0
+        }
+      }
+    }
+
 }
 
 function  drawenemy1()
@@ -117,6 +177,7 @@ function  drawenemy1()
     }
     if(enemy1[i].life == 0)
     {
+      score += 1
       enemy1.splice(i,1)
     }
   }
@@ -124,7 +185,6 @@ function  drawenemy1()
   {
     offContext.drawImage(nIgm(imgName[4][enemy1[i].index]),enemy1[i].x,enemy1[i].y)
   }
-
   for(i = 0;i < enemy1.length ; i++)
   {
     for(j = 0; j < hullet1.length; j++)
@@ -133,7 +193,6 @@ function  drawenemy1()
       let e = enemy1[i]
       if(e.x+e.width >= h.x && h.x + h.width >= e.x  && e.y+e.height >= h.y && h.y+h.height >= e.y)
       {
-        h.removable = 1
         e.life-=1
         enemy1[i].index+=1
         if(e.life < 0)
@@ -145,7 +204,6 @@ function  drawenemy1()
           enemy1[i].index ==0
         }
       }
-
     }
   }
 }
@@ -186,6 +244,11 @@ function  drawhullet1()
   }
 }
 
+function  drawsocre()
+{
+  offContext.strokeText('分数：'+score,350, 20)
+}
+
 export function ControlHero(x:number,y:number)
 {
   hero1.x = x
@@ -194,6 +257,7 @@ export function ControlHero(x:number,y:number)
 
 @Component
 export struct PlaneGame {
+  @State score:number = 0
   @State select: number = 2
   @Link x:number
   @Link y:number
@@ -201,107 +265,120 @@ export struct PlaneGame {
   private declareid: string[] = ['mydevice']
   build() {
     Column() {
-      Canvas(context)
-        .backgroundImage('/tracom/background.png')
-        .onReady(()=>{
+      Stack({alignContent: Alignment.Start}){
+        Canvas(context)
+          .backgroundImage('/tracom/background.png')
+          .onReady(()=>{
+            setInterval(()=>{
+              if(globalThis.remote == 1 && curPhase == 2)
+              {
+                offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
+                console.info("lxlx 状态有变化"+globalThis.status)
+                curPhase =globalThis.status
+              }
+              switch (curPhase){
+                case PHASE_READY:
+                  offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
+                  paintLogo()
+                  distr_link()
+                  break
+                case PHASE_LOADING:
+                  gameloading()
+                  break
+                case PHASE_PLAY:
+                  hero1.x = this.x
+                  hero1.y = this.y
+                  if(globalThis.remote == 1 || globalThis.remote1 == 1 )
+                  {
+                    console.info("lxlx 通过re对象位移了")
+                    hero1.x =globalThis.x
+                    hero1.y =globalThis.y
+                    this.x =globalThis.x
+                    this.y = globalThis.y
+                    globalThis.remote = 0
+                    globalThis.remote1 = 0
+                  }
+                  offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
+                  drawsocre()
+                  drawenemy1()
+                  drawhullet1()
+                  drawhero()
+                  break
+                case PHASE_PAUSE:
+                  drawPause()
+                  break
+                case PHASE_GAMEOVER:
+                  drawGameOver()
+                  break
+              }
+              let image = offContext.transferToImageBitmap();
+              context.transferFromImageBitmap(image);
+              this.score = score
+            },100)
+          })
+          .onTouch((event) => {
+            this.x=event.touches[0].x-124
+            this.y=event.touches[0].y-50
+            push_xy(event.touches[0].x-124,event.touches[0].y-50)
+            if(globalThis.app == 1)
+            {
+              console.info("lxlx 全局对象修改")
+              globalThis.remoteObject.x = event.touches[0].x-124
+              globalThis.remoteObject.y = event.touches[0].y-50
+            }
 
-          setInterval(()=>{
-            if(globalThis.remote == 1 && curPhase == 2)
+          })
+          .onClick((event)=>{
+            if(curPhase == 2 && event.x > 96 && event.y > 96 )
             {
               offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
-              console.info("lxlx 状态有变化"+globalThis.status)
-              curPhase =globalThis.status
+              g_object.status = PHASE_LOADING
+
+              curPhase = PHASE_LOADING
             }
-            switch (curPhase){
-              case PHASE_READY:
-                paintLogo()
-                distr_link()
-                break
-              case PHASE_LOADING:
-                gameloading()
-                break
-              case PHASE_PLAY:
-                hero1.x = this.x
-                hero1.y = this.y
-                if(globalThis.remote == 1 || globalThis.remote1 == 1 )
-                {
-                  console.info("lxlx 通过re对象位移了")
-                  hero1.x =globalThis.x
-                  hero1.y =globalThis.y
-                  this.x =globalThis.x
-                  this.y = globalThis.y
-                  globalThis.remote = 0
-                  globalThis.remote1 = 0
-
-                }
-                offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
-                drawenemy1()
-                drawhullet1()
-                drawhero()
-                break
-              case PHASE_PAUSE:
-                drawPause()
-                break
-              case PHASE_GAMEOVER:
-                drawGameOver()
-                break
-            }
-            let image = offContext.transferToImageBitmap();
-            context.transferFromImageBitmap(image);
-          },100)
-        })
-        .onTouch((event) => {
-          this.x=event.touches[0].x-124
-          this.y=event.touches[0].y-50
-          push_xy(event.touches[0].x-124,event.touches[0].y-50)
-          if(globalThis.app == 1)
-          {
-            console.info("lxlx 全局对象修改")
-            globalThis.remoteObject.x = event.touches[0].x-124
-            globalThis.remoteObject.y = event.touches[0].y-50
-          }
-
-        })
-        .onClick((event)=>{
-          if(curPhase == 2 && event.x > 96 && event.y > 96 )
-          {
-            offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
-            g_object.status = PHASE_LOADING
-
-            curPhase = PHASE_LOADING
-          }
-          if(event.x < 96 && event.y < 96 && curPhase == 2)
-          {
-            let deviceList =get_device()
-
-            if(deviceList != null)
+            if(event.x < 96 && event.y < 96 && curPhase == 2)
             {
-              this.device.push(deviceList[0].deviceName)
-            }
-            TextPickerDialog.show({
-              range: this.device,
-              selected: this.select,
-              onAccept: (value: TextPickerResult) => {
-                if(deviceList != null)
-                { let Coordinate
-                  Coordinate = activeapp(deviceList[0].deviceId)
-                  this.x = Coordinate[0]
-                  this.y = Coordinate[1]
-                }
-                // 设置select为按下确定按钮时候的选中项index，这样当弹窗再次弹出时显示选中的是上一次确定的选项
-                this.select = value.index
-                console.info("TextPickerDialog:onAccept()" + JSON.stringify(value))
-              },
-              onCancel: () => {
-                console.info("TextPickerDialog:onCancel()")
-              },
-              onChange: (value: TextPickerResult) => {
-                console.info("TextPickerDialog:onChange()" + JSON.stringify(value))
+              let deviceList =get_device()
+
+              if(deviceList != null)
+              {
+                this.device.push(deviceList[0].deviceName)
               }
-            })
-            this.device = ["本机器"]
-          }
-        })
+              TextPickerDialog.show({
+                range: this.device,
+                selected: this.select,
+                onAccept: (value: TextPickerResult) => {
+                  if(deviceList != null)
+                  { let Coordinate
+                    Coordinate = activeapp(deviceList[0].deviceId)
+                    this.x = Coordinate[0]
+                    this.y = Coordinate[1]
+                  }
+                  // 设置select为按下确定按钮时候的选中项index，这样当弹窗再次弹出时显示选中的是上一次确定的选项
+                  this.select = value.index
+                  console.info("TextPickerDialog:onAccept()" + JSON.stringify(value))
+                },
+                onCancel: () => {
+                  console.info("TextPickerDialog:onCancel()")
+                },
+                onChange: (value: TextPickerResult) => {
+                  console.info("TextPickerDialog:onChange()" + JSON.stringify(value))
+                }
+              })
+              this.device = ["本机器"]
+            }
+          })
+        // Text("分数："+this.score)
+        //   .textAlign(TextAlign.End)
+        //   .rotate({
+        //     x:0,
+        //     y:0,
+        //     z:1,
+        //     centerX:'50%',
+        //     centerY:"50%",
+        //     angle: 270
+        //     })
+      }
     }
   }
 }
