@@ -34,6 +34,8 @@ let settings:RenderingContextSettings = new RenderingContextSettings(true)
 let context: CanvasRenderingContext2D = new CanvasRenderingContext2D(settings)
 let offContext:OffscreenCanvasRenderingContext2D= new OffscreenCanvasRenderingContext2D(csreen_width, csreen_height, settings)
 let score = 0
+let init = 0
+let init1 = 0
 // 设置随机数种子
 let seed = 123; // 可以用任意数字来作为种子
 
@@ -101,6 +103,9 @@ function  drawGameOver()
   hero1.index = 0
   hullet1 = []
   enemy1 = []
+  globalThis.remote = 0
+  globalThis.status = PHASE_READY
+  seed = 123
 }
 
 function  drawPause()
@@ -267,8 +272,9 @@ export function ControlHero(x:number,y:number)
 export struct PlaneGame {
   @State score:number = 0
   @State select: number = 2
-  @Link x:number
-  @Link y:number
+  @State x:number = 676
+  @State y:number = 142
+
   private device: string[] = ['本机器']
   private declareid: string[] = ['mydevice']
   build() {
@@ -294,10 +300,22 @@ export struct PlaneGame {
                   gameloading()
                   break
                 case PHASE_PLAY:
+                  if(init1 == 0)
+                  {
+                    this.x = 676
+                    this.y = 142
+                    init1 = 1
+                  }
                   hero1.x = this.x
                   hero1.y = this.y
                   if(globalThis.remote == 1 || globalThis.remote1 == 1 )
                   {
+                    if(init == 0)
+                    {
+                      globalThis.x = 676
+                      globalThis.y = 142
+                      init =1
+                    }
                     console.info("lxlx 通过re对象位移了")
                     hero1.x =globalThis.x
                     hero1.y =globalThis.y
@@ -325,24 +343,27 @@ export struct PlaneGame {
             },100)
           })
           .onTouch((event) => {
-            this.x=event.touches[0].x-124
-            this.y=event.touches[0].y-50
-            push_xy(event.touches[0].x-124,event.touches[0].y-50)
-            if(globalThis.app == 1)
-            {
-              console.info("lxlx 全局对象修改")
-              globalThis.remoteObject.x = event.touches[0].x-124
-              globalThis.remoteObject.y = event.touches[0].y-50
-            }
 
+            if( curPhase == PHASE_PLAY)
+            {
+              this.x=event.touches[0].x-124
+              this.y=event.touches[0].y-50
+              push_xy(event.touches[0].x-124,event.touches[0].y-50)
+              if(globalThis.app == 1)
+              {
+                // console.info("lxlx 全局对象修改")
+                globalThis.remoteObject.x = event.touches[0].x-124
+                globalThis.remoteObject.y = event.touches[0].y-50
+              }
+            }
           })
           .onClick((event)=>{
             if(curPhase == 2 && event.x > 96 && event.y > 96 )
             {
               offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
               g_object.status = PHASE_LOADING
-
               curPhase = PHASE_LOADING
+
             }
             if(event.x < 96 && event.y < 96 && curPhase == 2)
             {
@@ -376,16 +397,6 @@ export struct PlaneGame {
               this.device = ["本机器"]
             }
           })
-        // Text("分数："+this.score)
-        //   .textAlign(TextAlign.End)
-        //   .rotate({
-        //     x:0,
-        //     y:0,
-        //     z:1,
-        //     centerX:'50%',
-        //     centerY:"50%",
-        //     angle: 270
-        //     })
       }
     }
   }

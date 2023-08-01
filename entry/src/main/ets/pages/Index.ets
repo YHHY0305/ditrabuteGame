@@ -22,7 +22,7 @@ struct Index {
   build() {
     Row() {
       Column(){
-         PlaneGame({x:$x,y:$y})
+         PlaneGame()
       }
     }
   }

@@ -166,11 +166,6 @@ export function  activeapp(dviceid:String):Array<number>
 
 }
 
-export  function remoteSta(status)
-{
-  g_object.status = status
-
-}
 
 
 
