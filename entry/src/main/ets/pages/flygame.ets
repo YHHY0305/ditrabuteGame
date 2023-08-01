@@ -34,6 +34,14 @@ let settings:RenderingContextSettings = new RenderingContextSettings(true)
 let context: CanvasRenderingContext2D = new CanvasRenderingContext2D(settings)
 let offContext:OffscreenCanvasRenderingContext2D= new OffscreenCanvasRenderingContext2D(csreen_width, csreen_height, settings)
 let score = 0
+// 设置随机数种子
+let seed = 123; // 可以用任意数字来作为种子
+
+function seededRandom(seed, min, max) {
+  let x = Math.sin(seed) * 10000;
+  const result = min + (x - Math.floor(x)) * (max - min);
+  return Math.floor(result);
+}
 
 function  nIgm(scr)
 {
@@ -126,7 +134,7 @@ function  drawhero()
     }
     hero1.hCout++
     if(hero1.hCout %5 == 0) {
-      enemy1.push(new enemy(Math.round(Math.random() * 320 + 20)))
+      enemy1.push(new enemy(seededRandom(seed++,20,340)))
     }
   }else{
     curPhase = PHASE_GAMEOVER
