@@ -1,11 +1,15 @@
 import lxpwmapi from '@ohos.lxpwmapi'
+import {hero,enemy,hullet} from "../object/hero"
 import distributedObject from '@ohos.data.distributedDataObject';
 import deviceManager from '@ohos.distributedHardware.deviceManager';
 let context
 export let g_object
 let deviceList1:deviceManager.DeviceInfo[]
 context = getContext(this) as any
-g_object = distributedObject.create(context, {name:"game", x:0,y:0,status:2});
+let hullet1:Array<hullet> =[]
+let enemy1:Array<enemy> =[]
+let hero1 = new hero
+g_object = distributedObject.create(context, {name:"game", x:0,y:0,status:2,hero:hero1,enemy:enemy1,hullet:hullet1});
 
 @Component
 export struct Gauge_show {
@@ -126,6 +130,7 @@ export function  activeapp(dviceid:String):Array<number>
   let  x
   let  y
   let  Coordinate  = []
+  console.info("lxlx"+JSON.stringify(g_object.hero))
    function  changeCallback(sessionId, changeData) {
     console.info(`change: ${sessionId}`);
     if (changeData !== null && changeData !== undefined) {
@@ -172,5 +177,12 @@ export  function remoteSta(status)
 
 }
 
-
+export function putObject(hero,enemy,hullet)
+{
+  g_object.hero =hero
+  g_object.enemy = enemy1
+  g_object.enemy = enemy
+  g_object.hullet = hullet1
+  g_object.hullet = hullet
+}
 

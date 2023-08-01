@@ -17,6 +17,7 @@ export class enemy{
   index:number = 0
   width:number = 51
   height:number = 51
+  removable:number = 0
   life:number = 5
   constructor(y:number)
   {

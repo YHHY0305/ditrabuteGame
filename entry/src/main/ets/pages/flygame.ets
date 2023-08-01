@@ -1,6 +1,6 @@
 import {hero,enemy,hullet} from "../object/hero"
 import promptAction from '@ohos.promptAction'
-import {g_object,activeapp,get_device,push_xy,Slider_contro,Gauge_show,link_device,activeButon}from "../pages/founction"
+import {putObject,g_object,activeapp,get_device,push_xy,Slider_contro,Gauge_show,link_device,activeButon}from "../pages/founction"
 let imgName = ['background.png', 'game_pause_nor.png', 'm1.png', 'start.png',
   // 敌机1
   ['enemy1.png', 'enemy1_down1.png', 'enemy1_down2.png', 'enemy1_down3.png', 'enemy1_down4.png'],
@@ -100,6 +100,15 @@ function  drawPause()
   offContext.drawImage(nIgm(imgName[1]),0,0)
 }
 
+
+
+
+function  remotedrawhero()
+{
+  offContext.drawImage(nIgm(imgName[8][globalThis.remoteObject.hero.index]),globalThis.remoteObject.hero.x,globalThis.remoteObject.hero.y)
+  hero1 = globalThis.remoteObject.hero
+}
+
 function  drawhero()
 {
   let i = 0
@@ -163,6 +172,21 @@ function  drawhero()
 
 }
 
+function  remotedrawenemy()
+{
+  let i = 0
+  for(i = 0 ;i < globalThis.remoteObject.enemy.length;i++)
+  {
+      offContext.drawImage(nIgm(imgName[4][globalThis.remoteObject.enemy[i].index]),globalThis.remoteObject.enemy[i].x,globalThis.remoteObject.enemy[i].y)
+  }
+  enemy1 = globalThis.remoteObject.enemy
+}
+
+async function asremotedrawenemy()
+{
+  await remotedrawenemy()
+}
+
 function  drawenemy1()
 {
   let i = 0
@@ -206,6 +230,22 @@ function  drawenemy1()
       }
     }
   }
+}
+
+function  remotedrawghullet()
+{
+  let i = 0
+  for(i = 0 ;i < globalThis.remoteObject.hullet.length;i++)
+  {
+
+      offContext.drawImage(nIgm(imgName[2]),globalThis.remoteObject.hullet[i].x,globalThis.remoteObject.hullet[i].y)
+  }
+  hullet1 = globalThis.remoteObject.hullet
+}
+
+async function asremotedrawghullet()
+{
+  await remotedrawghullet()
 }
 
 function  drawhullet1()
@@ -255,6 +295,12 @@ export function ControlHero(x:number,y:number)
   hero1.y = y
 }
 
+async function  aaa()
+{
+
+    await offContext.clearRect(0,0,csreen_width-10,csreen_height-10)
+
+}
 @Component
 export struct PlaneGame {
   @State score:number = 0
@@ -270,15 +316,16 @@ export struct PlaneGame {
           .backgroundImage('/tracom/background.png')
           .onReady(()=>{
             setInterval(()=>{
+
               if(globalThis.remote == 1 && curPhase == 2)
               {
                 offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
-                console.info("lxlx 状态有变化"+globalThis.status)
+                // console.info("lxlx 状态有变化"+globalThis.status)
                 curPhase =globalThis.status
               }
               switch (curPhase){
                 case PHASE_READY:
-                  offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
+                  offContext.clearRect(0,0,csreen_width-10,csreen_height-10)
                   paintLogo()
                   distr_link()
                   break
@@ -286,23 +333,27 @@ export struct PlaneGame {
                   gameloading()
                   break
                 case PHASE_PLAY:
-                  hero1.x = this.x
-                  hero1.y = this.y
-                  if(globalThis.remote == 1 || globalThis.remote1 == 1 )
-                  {
-                    console.info("lxlx 通过re对象位移了")
-                    hero1.x =globalThis.x
-                    hero1.y =globalThis.y
-                    this.x =globalThis.x
-                    this.y = globalThis.y
-                    globalThis.remote = 0
-                    globalThis.remote1 = 0
-                  }
-                  offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
-                  drawsocre()
-                  drawenemy1()
-                  drawhullet1()
-                  drawhero()
+                  // hero1.x = this.x
+                  // hero1.y = this.y
+                  // if(globalThis.remote == 1 || globalThis.remote1 == 1 )
+                  // {
+                    // console.info("lxlx 通过re对象位移了")
+                  offContext.clearRect(0,0,csreen_width-10,csreen_height-10)
+                    drawsocre()
+                    asremotedrawenemy()
+                    asremotedrawghullet()
+                    remotedrawhero()
+                    // this.x =globalThis.x
+                    // this.y = globalThis.y
+                    // globalThis.remote = 0
+                    // globalThis.remote1 = 0
+                  // }else{
+                  //   aaa()
+                  //   drawsocre()
+                  //   drawenemy1()
+                  //   drawhullet1()
+                  //   drawhero()
+                  // }
                   break
                 case PHASE_PAUSE:
                   drawPause()
@@ -313,7 +364,7 @@ export struct PlaneGame {
               }
               let image = offContext.transferToImageBitmap();
               context.transferFromImageBitmap(image);
-              this.score = score
+              putObject(hero1,enemy1,hullet1)
             },100)
           })
           .onTouch((event) => {

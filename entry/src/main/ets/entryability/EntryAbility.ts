@@ -19,12 +19,14 @@ export default class EntryAbility extends UIAbility {
         x:undefined,
         y:undefined,
         status:undefined,
+        hero:undefined,
+          enemy:undefined,
+          hullet:undefined,
       })
       console.info("lxlx  daozhelil")
 
       globalThis.remoteObject.setSessionId(sessionId).then(()=>{
           console.info("lxlx join session.");
-          console.info("lxlx"+globalThis.remoteObject.name)
         }).catch((erro)=>{
           console.info("lxlx加入错误"+erro.code+erro.message)
         })
@@ -33,6 +35,7 @@ export default class EntryAbility extends UIAbility {
         console.info(`change: ${sessionId}`);
         if (changeData !== null && changeData !== undefined) {
           // console.info("lxlx 有变化")
+          console.info("lxlx"+JSON.stringify(globalThis.remoteObject.enemy))
           globalThis.x = globalThis.remoteObject.x
           globalThis.y = globalThis.remoteObject.y
           globalThis.remote = 1
