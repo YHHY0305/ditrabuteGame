@@ -308,8 +308,13 @@ export struct PlaneGame {
           .onTouch((event) => {
             if( curPhase == PHASE_PLAY)
             {
-              hero1.x=event.touches[0].x-124
-              hero1.y=event.touches[0].y-50
+              console.info(TAG+hero1.x +"  "+hero1.y)
+              console.info(TAG+event.touches[0].x +"  "+event.touches[0].y)
+              if(event.touches[0].x>hero1.x && event.touches[0].x <hero1.x+150 && event.touches[0].y>hero1.y && event.touches[0].y-20 <hero1.y+70)
+              {
+                hero1.x=event.touches[0].x-124
+                hero1.y=event.touches[0].y-50
+              }
               if( globalThis.remote == 1)
               {
                 globalThis.remoteObject.hero = hero1
