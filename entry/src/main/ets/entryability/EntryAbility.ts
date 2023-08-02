@@ -17,9 +17,8 @@ export default class EntryAbility extends UIAbility {
       //join
         globalThis.remoteObject = distributedDataObject.create(this.context, {
         name:undefined,
-        x:undefined,
-        y:undefined,
-        status:undefined,
+        status:2,
+          hero:undefined,
       })
       console.info("lxlx  daozhelil")
 
@@ -31,14 +30,11 @@ export default class EntryAbility extends UIAbility {
         })
       //subscrib
       function changeCallback(sessionId, changeData) {
+        console.info("lxlx"+JSON.stringify(globalThis.remoteObject.hero))
         console.info(`change: ${sessionId}`);
         if (changeData !== null && changeData !== undefined) {
-          // console.info("lxlx 有变化")
-          globalThis.x = globalThis.remoteObject.x
-          globalThis.y = globalThis.remoteObject.y
           globalThis.remote = 1
           globalThis.app = 1
-          globalThis.status = globalThis.remoteObject.status
           changeData.forEach(element => {
           });
         }

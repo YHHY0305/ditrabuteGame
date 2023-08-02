@@ -13,9 +13,6 @@ function requestPermission() {
 @Entry
 @Component
 struct Index {
-  @State value: number = 0
-  @State x:number = 0
-  @State y:number = 0
   async aboutToAppear(){
     await requestPermission()
   }

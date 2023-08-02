@@ -1,11 +1,13 @@
 import lxpwmapi from '@ohos.lxpwmapi'
 import distributedObject from '@ohos.data.distributedDataObject';
 import deviceManager from '@ohos.distributedHardware.deviceManager';
+import {hero} from '../object/hero'
 let context
 export let g_object
 let deviceList1:deviceManager.DeviceInfo[]
 context = getContext(this) as any
-g_object = distributedObject.create(context, {name:"game", x:0,y:0,status:2});
+let hero1 = new hero
+g_object = distributedObject.create(context, {name:"game",status:2,hero:hero1});
 
 @Component
 export struct Gauge_show {
@@ -102,11 +104,6 @@ export struct link_device{
   }
 }
 
-export function push_xy(x:number,y:number){
-  g_object.x=x
-  g_object.y=y
-}
-
 export function get_device():deviceManager.DeviceInfo[]
 {
 deviceManager.createDeviceManager('com.example.mydevice', (err, value) => {
@@ -126,18 +123,11 @@ export function  activeapp(dviceid:String):Array<number>
   let  x
   let  y
   let  Coordinate  = []
+  g_object.x = 1
    function  changeCallback(sessionId, changeData) {
     console.info(`change: ${sessionId}`);
     if (changeData !== null && changeData !== undefined) {
       changeData.forEach(element => {
-        x = g_object.x
-        y = g_object.y
-        globalThis.remote1 = 1
-        globalThis.x = x
-        globalThis.y = y
-        Coordinate.push(x)
-        Coordinate.push(y)
-        console.info("lxlx"+x+"   "+y)
         console.info(`lxlx The element ${g_object[element]} changed.`);
       });
     }

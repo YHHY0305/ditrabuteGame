@@ -1,6 +1,6 @@
 import {hero,enemy,hullet} from "../object/hero"
 import promptAction from '@ohos.promptAction'
-import {g_object,activeapp,get_device,push_xy,Slider_contro,Gauge_show,link_device,activeButon}from "../pages/founction"
+import {g_object,activeapp,get_device,Slider_contro,Gauge_show,link_device,activeButon}from "../pages/founction"
 let imgName = ['background.png', 'game_pause_nor.png', 'm1.png', 'start.png',
   // 敌机1
   ['enemy1.png', 'enemy1_down1.png', 'enemy1_down2.png', 'enemy1_down3.png', 'enemy1_down4.png'],
@@ -73,38 +73,25 @@ function  paintLogo()
 
 function  drawGameOver()
 {
-  ActionSheet.show({
-    title: '游戏结束',
-    message: 'message',
-    autoCancel: true,
-    confirm: {
-      value: '确定',
-      action: () => {
-        console.log('Get Alert Dialog handled')
-      }
-    },
-    cancel: () => {
-      console.log('actionSheet canceled')
-    },
-    alignment: DialogAlignment.Bottom,
-    offset: { dx: 0, dy: -10 },
-    sheets: [
-      {
-        title: '你的得分为'+score,
-        action: () => {
-          console.log('pears')
-        }
-      }
-    ]
-  })
+  promptAction.showToast({
+    message: '游戏结束\n得分：'+ score,
+    duration: 2000
+  });
   curPhase = PHASE_READY
   hero1.life = 6
   score = 0
   hero1.index = 0
   hullet1 = []
   enemy1 = []
-  globalThis.remote = 0
-  globalThis.status = PHASE_READY
+  if(typeof globalThis.remoteObject != 'undefined')
+  {
+    globalThis.remoteObject.hero = hero1
+    globalThis.remoteObject.status = PHASE_READY
+  }else
+  {
+    g_object.hero = hero1
+    g_object.status = PHASE_READY
+  }
   seed = 123
 }
 
@@ -117,17 +104,6 @@ function  drawhero()
 {
   let i = 0
   if(hero1.life > 0){
-    // switch(hero1.life){
-    //   case 3:
-    //     offContext.drawImage(nIgm(imgName[8][0]),hero1.x,hero1.y)
-    //     break
-    //   case 2:
-    //     offContext.drawImage(nIgm(imgName[8][1]),hero1.x,hero1.y)
-    //     break
-    //   case 1:
-    //     offContext.drawImage(nIgm(imgName[8][2]),hero1.x,hero1.y)
-    //     break
-    // }
     offContext.drawImage(nIgm(imgName[8][hero1.index]),hero1.x,hero1.y)
     hero1.count++
     if(hero1.count % 3 == 0)
@@ -284,15 +260,14 @@ export struct PlaneGame {
           .backgroundImage('/tracom/background.png')
           .onReady(()=>{
             setInterval(()=>{
-              if(globalThis.remote == 1 && curPhase == 2)
-              {
-                offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
-                console.info("lxlx 状态有变化"+globalThis.status)
-                curPhase =globalThis.status
+              if(typeof globalThis.remoteObject != 'undefined'&& curPhase == 2){
+                curPhase =globalThis.remoteObject.status
+              }else if(curPhase == 2){
+                curPhase = g_object.status
               }
               switch (curPhase){
                 case PHASE_READY:
-                  offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
+                  offContext.clearRect(0,0,csreen_width-5,csreen_height-5)
                   paintLogo()
                   distr_link()
                   break
@@ -300,29 +275,13 @@ export struct PlaneGame {
                   gameloading()
                   break
                 case PHASE_PLAY:
-                  if(init1 == 0)
+                  if(typeof globalThis.remoteObject != 'undefined')
                   {
-                    this.x = 676
-                    this.y = 142
-                    init1 = 1
+                    hero1 = globalThis.remoteObject.hero
                   }
-                  hero1.x = this.x
-                  hero1.y = this.y
-                  if(globalThis.remote == 1 || globalThis.remote1 == 1 )
+                  else
                   {
-                    if(init == 0)
-                    {
-                      globalThis.x = 676
-                      globalThis.y = 142
-                      init =1
-                    }
-                    console.info("lxlx 通过re对象位移了")
-                    hero1.x =globalThis.x
-                    hero1.y =globalThis.y
-                    this.x =globalThis.x
-                    this.y = globalThis.y
-                    globalThis.remote = 0
-                    globalThis.remote1 = 0
+                    hero1 = g_object.hero
                   }
                   offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
                   drawsocre()
@@ -339,21 +298,27 @@ export struct PlaneGame {
               }
               let image = offContext.transferToImageBitmap();
               context.transferFromImageBitmap(image);
+              if( typeof globalThis.remoteObject != 'undefined')
+              {
+                globalThis.remoteObject.hero = hero1
+              }else{
+                g_object.hero = hero1
+              }
               this.score = score
             },100)
           })
           .onTouch((event) => {
-
             if( curPhase == PHASE_PLAY)
             {
-              this.x=event.touches[0].x-124
-              this.y=event.touches[0].y-50
-              push_xy(event.touches[0].x-124,event.touches[0].y-50)
-              if(globalThis.app == 1)
+              hero1.x=event.touches[0].x-124
+              hero1.y=event.touches[0].y-50
+              if(g_object.x == 1)
               {
-                // console.info("lxlx 全局对象修改")
-                globalThis.remoteObject.x = event.touches[0].x-124
-                globalThis.remoteObject.y = event.touches[0].y-50
+                g_object.hero = hero1
+              }
+              if( typeof globalThis.remoteObject != 'undefined')
+              {
+                globalThis.remoteObject.hero = hero1
               }
             }
           })
@@ -361,9 +326,13 @@ export struct PlaneGame {
             if(curPhase == 2 && event.x > 96 && event.y > 96 )
             {
               offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
-              g_object.status = PHASE_LOADING
+              if( typeof globalThis.remoteObject != 'undefined')
+              {
+                globalThis.remoteObject.status = PHASE_LOADING
+              }else{
+                g_object.status = PHASE_LOADING
+              }
               curPhase = PHASE_LOADING
-
             }
             if(event.x < 96 && event.y < 96 && curPhase == 2)
             {
