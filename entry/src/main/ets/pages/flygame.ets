@@ -238,11 +238,6 @@ function  drawsocre()
   offContext.strokeText('分数：'+score,350, 20)
 }
 
-export function ControlHero(x:number,y:number)
-{
-  hero1.x = x
-  hero1.y = y
-}
 
 @Component
 export struct PlaneGame {
@@ -304,6 +299,15 @@ export struct PlaneGame {
 
               this.score = score
             },100)
+            setInterval(()=>{
+              if( globalThis.remote == 1)
+              {
+                globalThis.remoteObject.hero = hero1
+              }else
+              {
+                g_object.hero = hero1
+              }
+            },500)
           })
           .onTouch((event) => {
             if( curPhase == PHASE_PLAY)
