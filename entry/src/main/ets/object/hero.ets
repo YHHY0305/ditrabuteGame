@@ -21,6 +21,18 @@ export class enemy{
     this.y = y
   }
 }
+export class cBossenemy{
+  x:number = 0
+  y:number = 0
+  index:number = 0
+  width:number = 258
+  height:number = 169
+  life:number = 200
+  constructor(y:number)
+  {
+    this.y = y
+  }
+}
 export class hullet{
   x:number = 0
   y:number = 0

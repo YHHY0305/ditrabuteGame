@@ -1,19 +1,19 @@
-import {hero,enemy,hullet} from "../object/hero"
+import {hero,enemy,hullet,cBossenemy} from "../object/hero"
 import promptAction from '@ohos.promptAction'
-import {g_object,activeapp,get_device,Slider_contro,Gauge_show,link_device,activeButon}from "../pages/founction"
+import {g_object,activeapp,get_device}from "../pages/founction"
 let imgName = ['background.png', 'game_pause_nor.png', 'm1.png', 'start.png',
   // 敌机1
   ['enemy1.png', 'enemy1_down1.png', 'enemy1_down2.png', 'enemy1_down3.png', 'enemy1_down4.png'],
   // 敌机2
-  ['enemy12.png', 'enemy12_down1.png', 'enemy12_down2.png', 'enemy12_down3.png', 'enemy12_down4.png'],
+  ['enemy2.png', 'enemy2_down1.png', 'enemy2_down2.png', 'enemy2_down3.png', 'enemy2_down4.png'],
   // 敌机3
-  ['enemy13_n1.png', 'enemy13_n2.png', 'enemy13_hit.png', 'enemy13_down1.png', 'enemy13_down2.png', 'enemy13_down3.png', 'enemy13_down4.png', 'enemy13_down5.png', 'enemy13_down6.png', ],
+  ['enemy3_n1.png', 'enemy3_n2.png', 'enemy3_hit.png', 'enemy3_down1.png', 'enemy3_down2.png', 'enemy3_down3.png', 'enemy3_down4.png', 'enemy3_down5.png', 'enemy3_down6.png', ],
   // 游戏loading图
   ['game_loading1.png', 'game_loading2.png', 'game_loading3.png', 'game_loading4.png'],
   // 玩家飞机图
   ['hero1.png', 'hero2.png', 'hero_blowup_n1.png', 'hero_blowup_n2.png', 'hero_blowup_n3.png', 'hero_blowup_n4.png'],
 
-  ['icon_000.png']
+  ['icon_000.png'],'m.png'
 ];
 let curPhase = 2;
 const TAG = "lxlx"
@@ -28,7 +28,9 @@ const csreen_height = 400;
 
 let index = 0
 let hullet1:Array<hullet> =[]
+let hullete:Array<hullet> =[]
 let enemy1:Array<enemy> =[]
+let enemyBoss:Array<cBossenemy> =[]
 let hero1 = new hero
 let settings:RenderingContextSettings = new RenderingContextSettings(true)
 let context: CanvasRenderingContext2D = new CanvasRenderingContext2D(settings)
@@ -36,6 +38,8 @@ let offContext:OffscreenCanvasRenderingContext2D= new OffscreenCanvasRenderingCo
 let score = 0
 let count:number = 9
 let hCout:number = 0
+let mCout:number = 0
+let qcout:number = 0
 // 设置随机数种子
 let seed = 123; // 可以用任意数字来作为种子
 
@@ -105,6 +109,11 @@ function  drawhero()
   let i = 0
   if(hero1.life > 0){
     offContext.drawImage(nIgm(imgName[8][hero1.index]),hero1.x,hero1.y)
+    mCout++
+    if(mCout % 200 == 0){
+     enemyBoss.push(new cBossenemy(seededRandom(seed++,20,340)))
+      mCout= 0
+    }
     count++
     if(count % 3 == 0)
     {
@@ -197,6 +206,58 @@ function  drawenemy1()
   }
 }
 
+// function  drawenemyBoss()
+// {
+//   let i = 0
+//   let j = 0
+//   for(i;i < enemyBoss.length;i++)
+//   {
+//     qcout++
+//     if(qcout % 3 == 0)
+//     {
+//       hullete.push(new hullet(enemyBoss[i].x,enemyBoss[i].y,1))
+//       hullete.push(new hullet(enemyBoss[i].x,enemyBoss[i].y,2))
+//       hullete.push(new hullet(enemyBoss[i].x,enemyBoss[i].y,3))
+//       qcout= 0
+//     }
+//     if(enemyBoss[i].x < 0 || enemyBoss[i].x > 800 || enemyBoss[i].y < 0 || enemyBoss[i].y > 480)
+//     {
+//       enemyBoss[i].life = 0
+//     }
+//     if(enemyBoss[i].life == 0)
+//     {
+//       score += 1
+//       enemyBoss.splice(i,1)
+//     }
+//   }
+//   for(i = 0 ;i < enemyBoss.length;i++)
+//   {
+//     offContext.drawImage(nIgm(imgName[6][enemyBoss[i].index]),enemyBoss[i].x,enemyBoss[i].y)
+//   }
+//   for(i = 0;i < enemyBoss.length ; i++)
+//   {
+//     for(j = 0; j < hullet1.length; j++)
+//     {
+//       let h = hullet1[j]
+//       let e = enemyBoss[i]
+//       if(e.x+e.width >= h.x && h.x + h.width >= e.x  && e.y+e.height >= h.y && h.y+h.height >= e.y)
+//       {
+//         e.life-=1
+//         console.info(TAG+e.life)
+//         enemyBoss[i].index+=1
+//         if(e.life < 0)
+//         {
+//           e.life = 0
+//         }
+//         if(enemyBoss[i].index == 8 )
+//         {
+//           enemyBoss[i].index =0
+//         }
+//       }
+//     }
+//   }
+// }
+
 function  drawhullet1()
 {
   let i = 0
@@ -233,10 +294,47 @@ function  drawhullet1()
   }
 }
 
+function  drawhullete()
+{
+  let i = 0
+  for(i;i < hullete.length;i++)
+  {
+    switch(hullete[i].n){
+      case 1:
+        hullete[i].y-=1
+        hullete[i].x+=40
+        break
+      case 2:
+        hullete[i].y+=1
+        hullete[i].x+=40
+        break
+      case 3:
+        hullete[i].x+=40
+        break
+      default:
+        console.log("lxlx invalid n")
+        break
+    }
+    if(hullete[i].x < 0 || hullete[i].x >= 800 || hullete[i].y < 0 || hullete[i].y >= 480)
+    {
+      hullete[i].removable = 1
+    }
+    if(hullete[i].removable == 1)
+    {
+      hullet1.splice(i,1)
+    }
+  }
+  for(i = 0 ;i < hullete.length;i++)
+  {
+    offContext.drawImage(nIgm(imgName[10]),hullete[i].x,hullete[i].y)
+  }
+}
+
 function  drawsocre()
 {
   offContext.strokeText('分数：'+score,350, 20)
 }
+
 
 
 @Component
@@ -284,7 +382,9 @@ export struct PlaneGame {
                   offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
                   drawsocre()
                   drawenemy1()
+                  // drawenemyBoss()
                   drawhullet1()
+                  // drawhullete()
                   drawhero()
                   break
                 case PHASE_PAUSE:
@@ -314,8 +414,10 @@ export struct PlaneGame {
             {
               console.info(TAG+hero1.x +"  "+hero1.y)
               console.info(TAG+event.touches[0].x +"  "+event.touches[0].y)
-              if(event.touches[0].x>hero1.x && event.touches[0].x <hero1.x+150 && event.touches[0].y>hero1.y && event.touches[0].y-20 <hero1.y+70)
+              if(event.touches[0].x>hero1.x && event.touches[0].x <hero1.x+200 && event.touches[0].y>hero1.y-20 && event.touches[0].y<hero1.y+150)
               {
+                // offContext.fillRect(hero1.x,hero1.y-20,hero1.x+200,hero1.y+200)
+                console.info(TAG+"黑框"+hero1.x+" "+hero1.y)
                 hero1.x=event.touches[0].x-124
                 hero1.y=event.touches[0].y-50
               }
