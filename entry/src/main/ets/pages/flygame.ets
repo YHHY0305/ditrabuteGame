@@ -34,8 +34,8 @@ let settings:RenderingContextSettings = new RenderingContextSettings(true)
 let context: CanvasRenderingContext2D = new CanvasRenderingContext2D(settings)
 let offContext:OffscreenCanvasRenderingContext2D= new OffscreenCanvasRenderingContext2D(csreen_width, csreen_height, settings)
 let score = 0
-let init = 0
-let init1 = 0
+let count:number = 9
+let hCout:number = 0
 // 设置随机数种子
 let seed = 123; // 可以用任意数字来作为种子
 
@@ -83,7 +83,7 @@ function  drawGameOver()
   hero1.index = 0
   hullet1 = []
   enemy1 = []
-  if(typeof globalThis.remoteObject != 'undefined')
+  if(globalThis.remote == 1)
   {
     globalThis.remoteObject.hero = hero1
     globalThis.remoteObject.status = PHASE_READY
@@ -105,16 +105,16 @@ function  drawhero()
   let i = 0
   if(hero1.life > 0){
     offContext.drawImage(nIgm(imgName[8][hero1.index]),hero1.x,hero1.y)
-    hero1.count++
-    if(hero1.count % 3 == 0)
+    count++
+    if(count % 3 == 0)
     {
       hullet1.push(new hullet(hero1.x,hero1.y,1))
       hullet1.push(new hullet(hero1.x,hero1.y,2))
       hullet1.push(new hullet(hero1.x,hero1.y,3))
-      hero1.count = 0
+      count= 0
     }
-    hero1.hCout++
-    if(hero1.hCout %5 == 0) {
+    hCout++
+    if(hCout %5 == 0) {
       enemy1.push(new enemy(seededRandom(seed++,20,340)))
     }
   }else{
@@ -259,10 +259,13 @@ export struct PlaneGame {
         Canvas(context)
           .backgroundImage('/tracom/background.png')
           .onReady(()=>{
+            console.info(TAG+ "页面刷新")
             setInterval(()=>{
-              if(typeof globalThis.remoteObject != 'undefined'&& curPhase == 2){
+              if(globalThis.remote == 1&& curPhase == 2){
+                offContext.clearRect(0,0,csreen_width-5,csreen_height-5)
                 curPhase =globalThis.remoteObject.status
               }else if(curPhase == 2){
+                offContext.clearRect(0,0,csreen_width-5,csreen_height-5)
                 curPhase = g_object.status
               }
               switch (curPhase){
@@ -275,11 +278,11 @@ export struct PlaneGame {
                   gameloading()
                   break
                 case PHASE_PLAY:
-                  if(typeof globalThis.remoteObject != 'undefined')
+                  if(globalThis.remote == 1)
                   {
+                    console.info(TAG+globalThis.remote+"读取了")
                     hero1 = globalThis.remoteObject.hero
-                  }
-                  else
+                  } else
                   {
                     hero1 = g_object.hero
                   }
@@ -298,12 +301,7 @@ export struct PlaneGame {
               }
               let image = offContext.transferToImageBitmap();
               context.transferFromImageBitmap(image);
-              if( typeof globalThis.remoteObject != 'undefined')
-              {
-                globalThis.remoteObject.hero = hero1
-              }else{
-                g_object.hero = hero1
-              }
+
               this.score = score
             },100)
           })
@@ -312,13 +310,12 @@ export struct PlaneGame {
             {
               hero1.x=event.touches[0].x-124
               hero1.y=event.touches[0].y-50
-              if(g_object.x == 1)
-              {
-                g_object.hero = hero1
-              }
-              if( typeof globalThis.remoteObject != 'undefined')
+              if( globalThis.remote == 1)
               {
                 globalThis.remoteObject.hero = hero1
+              }else
+              {
+                g_object.hero = hero1
               }
             }
           })
@@ -326,7 +323,7 @@ export struct PlaneGame {
             if(curPhase == 2 && event.x > 96 && event.y > 96 )
             {
               offContext.clearRect(0,0,csreen_width-1,csreen_height-1)
-              if( typeof globalThis.remoteObject != 'undefined')
+              if(  globalThis.remote == 1)
               {
                 globalThis.remoteObject.status = PHASE_LOADING
               }else{

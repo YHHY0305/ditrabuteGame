@@ -20,6 +20,7 @@ export default class EntryAbility extends UIAbility {
         status:2,
           hero:undefined,
       })
+
       console.info("lxlx  daozhelil")
 
       globalThis.remoteObject.setSessionId(sessionId).then(()=>{

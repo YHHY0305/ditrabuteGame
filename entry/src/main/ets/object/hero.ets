@@ -4,8 +4,6 @@ export class hero{
   width:number = 124
   height:number = 99
   index:number = 0
-  count:number = 9
-  hCout:number = 0
   eCout:number = 0
   n:number = 0
   removable:number = 0
